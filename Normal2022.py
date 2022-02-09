@@ -2,7 +2,7 @@ import os
 from PySide2.QtWidgets import QVBoxLayout
 from PySide2.QtWidgets import QWidget
 from PySide2.QtWidgets import QDialog
-from PySide2.QtWidgets import QPushButton,QRadioButton
+from PySide2.QtWidgets import QPushButton,QRadioButton,QSlider
 from PySide2.QtCore import QFile
 from PySide2.QtUiTools import QUiLoader
 from pymxs import runtime as rt
@@ -22,9 +22,11 @@ class TestDialog(QDialog):
         layout = QVBoxLayout()
         layout.addWidget(self.ui)
         self.setLayout(layout)
-        self.setWindowTitle("技术中心_法线工具1.0")
+        self.setWindowTitle("技术中心_法线工具v1.0")
 
         # -------------------creat weight----------------
+        self.horizontalSlider = self.ui.findChild(QSlider, 'horizontalSlider')
+
         but_display_normal = self.ui.findChild(QPushButton, 'but_display_normal')
         but_close_normal = self.ui.findChild(QPushButton, 'but_close_normal')
         but_x_add = self.ui.findChild(QPushButton, 'but_x_add')
@@ -45,6 +47,8 @@ class TestDialog(QDialog):
         but_normal_select_2 = self.ui.findChild(QPushButton, 'but_normal_select_2')
         but_normal_strore_3 = self.ui.findChild(QPushButton, 'but_normal_strore_3')
         but_normal_select_3 = self.ui.findChild(QPushButton, 'but_normal_select_3')
+
+
 
 
         #---------------------------connect funcution------------------------
@@ -81,8 +85,13 @@ class TestDialog(QDialog):
         but_normal_strore_3.clicked.connect(self.store_3)
         but_normal_select_3.clicked.connect(self.select_3)
 
-        self.resize(400, 350)
+        self.horizontalSlider.valueChanged.connect(self.normal_length)
 
+        self.resize(400, 450)
+
+
+    def normal_length(self):
+        self.normal.displayLength = self.horizontalSlider.value()
 
     def display_normal(self):
         self.normal = rt.Edit_Normals()
@@ -179,10 +188,11 @@ class TestDialog(QDialog):
 if __name__ == '__main__':
 
     try:
-        dlg.close()
-        dlg.deleteLater()
+        tool_window.close()
+        tool_window.deleteLater()
 
     except:
         pass
-    dlg = TestDialog()
-    dlg.show()
+    tool_window = TestDialog()
+    tool_window.show()
+

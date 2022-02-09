@@ -6,39 +6,61 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>372</width>
-    <height>408</height>
+    <width>442</width>
+    <height>443</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>DAM法线工具</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QGroupBox" name="">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>显示</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QPushButton" name="but_display_normal">
-        <property name="text">
-         <string>添加法线</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>法线显示长度</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="horizontalSlider">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="but_close_normal">
-        <property name="text">
-         <string>关闭法线</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QPushButton" name="but_display_normal">
+          <property name="text">
+           <string>添加法线</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="but_close_normal">
+          <property name="text">
+           <string>关闭法线</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="">
+    <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>偏移值</string>
      </property>
