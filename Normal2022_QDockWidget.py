@@ -33,58 +33,63 @@ class TestDialog(QDockWidget):
         self.setWindowFlags(QtCore.Qt.Tool)#设置窗口属性，枚举
         self.setWindowTitle("技术中心_法线工具v1.0")
 
-        # -------------------creat weight----------------
+        self.creat_widget()
+        self.creat_layout()
+        self.resize(500, 550)
+
+    def creat_widget(self):
+
         self.horizontalSlider = self.ui.findChild(QSlider, 'horizontalSlider')
 
-        but_display_normal = self.ui.findChild(QPushButton, 'but_display_normal')
-        but_close_normal = self.ui.findChild(QPushButton, 'but_close_normal')
-        but_x_add = self.ui.findChild(QPushButton, 'but_x_add')
-        but_x_sub = self.ui.findChild(QPushButton, 'but_x_sub')
-        but_y_add = self.ui.findChild(QPushButton, 'but_y_add')
-        but_y_sub = self.ui.findChild(QPushButton, 'but_y_sub')
-        but_z_add = self.ui.findChild(QPushButton, 'but_z_add')
-        but_z_sub = self.ui.findChild(QPushButton, 'but_z_sub')
+        self.but_display_normal = self.ui.findChild(QPushButton, 'but_display_normal')
+        self.but_close_normal = self.ui.findChild(QPushButton, 'but_close_normal')
+        self.but_x_add = self.ui.findChild(QPushButton, 'but_x_add')
+        self.but_x_sub = self.ui.findChild(QPushButton, 'but_x_sub')
+        self.but_y_add = self.ui.findChild(QPushButton, 'but_y_add')
+        self.but_y_sub = self.ui.findChild(QPushButton, 'but_y_sub')
+        self.but_z_add = self.ui.findChild(QPushButton, 'but_z_add')
+        self.but_z_sub = self.ui.findChild(QPushButton, 'but_z_sub')
 
+        self.rad_one = self.ui.findChild(QRadioButton, 'rad_one')
+        self.rad_five = self.ui.findChild(QRadioButton, 'rad_five')
+        self.rad_ten = self.ui.findChild(QRadioButton, 'rad_ten')
 
-        self.rad_one = self.ui.findChild(QRadioButton,'rad_one')
-        self.rad_five = self.ui.findChild(QRadioButton,'rad_five')
-        self.rad_ten = self.ui.findChild(QRadioButton,'rad_ten')
-
-        but_normal_strore = self.ui.findChild(QPushButton, 'but_normal_strore')
-        but_normal_select = self.ui.findChild(QPushButton, 'but_normal_select')
-        but_normal_strore_2 = self.ui.findChild(QPushButton, 'but_normal_strore_2')
-        but_normal_select_2 = self.ui.findChild(QPushButton, 'but_normal_select_2')
-        but_normal_strore_3 = self.ui.findChild(QPushButton, 'but_normal_strore_3')
-        but_normal_select_3 = self.ui.findChild(QPushButton, 'but_normal_select_3')
+        self.but_normal_strore = self.ui.findChild(QPushButton, 'but_normal_strore')
+        self.but_normal_select = self.ui.findChild(QPushButton, 'but_normal_select')
+        self.but_normal_strore_2 = self.ui.findChild(QPushButton, 'but_normal_strore_2')
+        self.but_normal_select_2 = self.ui.findChild(QPushButton, 'but_normal_select_2')
+        self.but_normal_strore_3 = self.ui.findChild(QPushButton, 'but_normal_strore_3')
+        self.but_normal_select_3 = self.ui.findChild(QPushButton, 'but_normal_select_3')
 
         self.start_value()
 
-        #---------------------------connect funcution------------------------
-        but_display_normal.clicked.connect(self.display_normal)
+    def creat_layout(self):
+
+        self.but_display_normal.clicked.connect(self.display_normal)
         self.rad_one.toggled.connect(self.offset_value_rad)
         self.rad_five.toggled.connect(self.offset_value_rad)
         self.rad_ten.toggled.connect(self.offset_value_rad)
 
-        but_close_normal.clicked.connect(self.close_normal)
-        but_x_add.clicked.connect(self.offert_x_add)
-        but_x_sub.clicked.connect(self.offert_x_sub)
-        but_y_add.clicked.connect(self.offert_y_add)
-        but_y_sub.clicked.connect(self.offert_y_sub)
-        but_z_add.clicked.connect(self.offert_z_add)
-        but_z_sub.clicked.connect(self.offert_z_sub)
+        self.but_close_normal.clicked.connect(self.close_normal)
+        self.but_x_add.clicked.connect(self.offert_x_add)
+        self.but_x_sub.clicked.connect(self.offert_x_sub)
+        self.but_y_add.clicked.connect(self.offert_y_add)
+        self.but_y_sub.clicked.connect(self.offert_y_sub)
+        self.but_z_add.clicked.connect(self.offert_z_add)
+        self.but_z_sub.clicked.connect(self.offert_z_sub)
 
-        but_normal_strore.clicked.connect(self.store_1)
-        but_normal_select.clicked.connect(self.select_1)
+        self.but_normal_strore.clicked.connect(self.store_1)
+        self.but_normal_select.clicked.connect(self.select_1)
 
-        but_normal_strore_2.clicked.connect(self.store_2)
-        but_normal_select_2.clicked.connect(self.select_2)
+        self.but_normal_strore_2.clicked.connect(self.store_2)
+        self.but_normal_select_2.clicked.connect(self.select_2)
 
-        but_normal_strore_3.clicked.connect(self.store_3)
-        but_normal_select_3.clicked.connect(self.select_3)
+        self.but_normal_strore_3.clicked.connect(self.store_3)
+        self.but_normal_select_3.clicked.connect(self.select_3)
 
         self.horizontalSlider.valueChanged.connect(self.normal_length)
 
-        self.resize(400, 450)
+        self.resize(500, 550)
 
     def start_value(self):
         if (self.rad_one.isChecked()):
@@ -97,10 +102,8 @@ class TestDialog(QDockWidget):
             self.offset_value_z_add = rt.quat(0, 0.0871557 / 10, 0, 0.999848)
             self.offset_value_z_sub = rt.quat(0, -0.0871557 / 10, 0, 0.999848)
 
-
     def normal_length(self):
         self.normal.displayLength = self.horizontalSlider.value()
-
 
     def display_normal(self):
         self.normal = rt.Edit_Normals()
@@ -111,7 +114,6 @@ class TestDialog(QDockWidget):
 
         self.horizontalSlider.setValue(self.normal.displayLength)
         rt.redrawViews()
-
 
     def close_normal(self):
         rt.convertToPoly(rt.selection)
