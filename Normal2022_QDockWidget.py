@@ -9,7 +9,7 @@ from PySide2.QtUiTools import QUiLoader
 import qtmax
 from pymxs import runtime as rt
 '''
-3dmax2022
+3dmax2022  法线工具
 继承QDockWidget 版本，窗口属于3dmax工具面板
 
 
