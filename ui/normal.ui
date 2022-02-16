@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
-    <height>443</height>
+    <width>468</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -205,6 +205,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="btn_recover_normal">
+       <property name="text">
+        <string>重置</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -230,6 +237,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>重置</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -252,6 +266,13 @@
       <widget class="QPushButton" name="but_normal_select_3">
        <property name="text">
         <string>选择</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="text">
+        <string>重置</string>
        </property>
       </widget>
      </item>

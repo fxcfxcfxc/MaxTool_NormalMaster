@@ -9,7 +9,8 @@ from PySide2.QtUiTools import QUiLoader
 import qtmax
 from pymxs import runtime as rt
 '''
-3dmax2022  法线工具
+3dmax2022  
+法线工具
 继承QDockWidget 版本，窗口属于3dmax工具面板
 
 
@@ -30,9 +31,9 @@ class TestDialog(QDockWidget):
         ui_file.open(QFile.ReadOnly)#文件只读
         self.ui = loader.load(ui_file, self)#导入ui内部的信息
         ui_file.close()
+        #-----
         self.setWindowFlags(QtCore.Qt.Tool)#设置窗口属性，枚举
         self.setWindowTitle("技术中心_法线工具v1.0")
-
         self.creat_widget()
         self.creat_layout()
         self.resize(500, 550)
@@ -56,8 +57,11 @@ class TestDialog(QDockWidget):
 
         self.but_normal_strore = self.ui.findChild(QPushButton, 'but_normal_strore')
         self.but_normal_select = self.ui.findChild(QPushButton, 'but_normal_select')
+        self.btn_recover_normal = self.ui.findChild(QPushButton, 'btn_recover_normal')
+
         self.but_normal_strore_2 = self.ui.findChild(QPushButton, 'but_normal_strore_2')
         self.but_normal_select_2 = self.ui.findChild(QPushButton, 'but_normal_select_2')
+
         self.but_normal_strore_3 = self.ui.findChild(QPushButton, 'but_normal_strore_3')
         self.but_normal_select_3 = self.ui.findChild(QPushButton, 'but_normal_select_3')
 
@@ -80,6 +84,7 @@ class TestDialog(QDockWidget):
 
         self.but_normal_strore.clicked.connect(self.store_1)
         self.but_normal_select.clicked.connect(self.select_1)
+        self.btn_recover_normal.clicked.connect(self.recover_1)
 
         self.but_normal_strore_2.clicked.connect(self.store_2)
         self.but_normal_select_2.clicked.connect(self.select_2)
@@ -93,14 +98,15 @@ class TestDialog(QDockWidget):
 
     def start_value(self):
         if (self.rad_one.isChecked()):
-            self.offset_value_x_add = rt.quat(0.0871557 / 10, 0, 0, 0.999848)
-            self.offset_value_x_sub = rt.quat(-0.0871557 / 10, 0, 0, 0.999848)
+            # value  = 0.1
+            self.offset_value_x_add = rt.Point3(0.05, 0, 0)
+            self.offset_value_x_sub = rt.Point3(-0.05, 0, 0)
 
-            self.offset_value_y_add = rt.quat(0, 0, 0.0871557 / 10, 0.999848)
-            self.offset_value_y_sub = rt.quat(0, 0, -0.0871557 / 10, 0.999848)
+            self.offset_value_y_add = rt.Point3(0, 0.05, 0)
+            self.offset_value_y_sub = rt.Point3(0, -0.05, 0)
 
-            self.offset_value_z_add = rt.quat(0, 0.0871557 / 10, 0, 0.999848)
-            self.offset_value_z_sub = rt.quat(0, -0.0871557 / 10, 0, 0.999848)
+            self.offset_value_z_add = rt.Point3(0, 0, 0.05)
+            self.offset_value_z_sub = rt.Point3(0, 0, -0.05)
 
     def normal_length(self):
         self.normal.displayLength = self.horizontalSlider.value()
@@ -121,62 +127,83 @@ class TestDialog(QDockWidget):
         rt.redrawViews()
 
     def offert_x_add(self):
-        self.normal.Rotate(self.offset_value_x_add)
+        self.normal.Move(self.offset_value_x_add)
 
     def offert_x_sub(self):
-        self.normal.Rotate(self.offset_value_x_sub)
+        self.normal.Move(self.offset_value_x_sub)
 
     def offert_y_add(self):
-        self.normal.Rotate(self.offset_value_y_add)
+        self.normal.Move(self.offset_value_y_add)
 
     def offert_y_sub(self):
-        self.normal.Rotate(self.offset_value_z_sub)
+        self.normal.Move(self.offset_value_z_sub)
 
     def offert_z_add(self):
-        self.normal.Rotate(self.offset_value_z_add)
+        self.normal.Move(self.offset_value_z_add)
 
     def offert_z_sub(self):
-        self.normal.Rotate(self.offset_value_z_sub)
+        self.normal.Move(self.offset_value_z_sub)
 
     def offset_value_rad(self):
         if(self.rad_one.isChecked()):
-            self.offset_value_x_add = rt.quat(0.0871557 / 10, 0, 0, 0.999848)
-            self.offset_value_x_sub = rt.quat(-0.0871557 / 10, 0, 0, 0.999848)
+            # value  = 0.1
+            self.offset_value_x_add = rt.Point3(0.05,0,0)
+            self.offset_value_x_sub = rt.Point3(-0.05,0,0)
 
-            self.offset_value_y_add = rt.quat(0, 0, 0.0871557 / 10, 0.999848)
-            self.offset_value_y_sub = rt.quat(0, 0, -0.0871557 / 10, 0.999848)
+            self.offset_value_y_add = rt.Point3(0,0.05,0)
+            self.offset_value_y_sub = rt.Point3(0,-0.05,0)
 
-            self.offset_value_z_add = rt.quat(0, 0.0871557 / 10, 0, 0.999848)
-            self.offset_value_z_sub = rt.quat(0, -0.0871557 / 10, 0, 0.999848)
+            self.offset_value_z_add = rt.Point3(0,0,0.05)
+            self.offset_value_z_sub = rt.Point3(0,0,-0.05)
 
         if(self.rad_five.isChecked()):
-            self.offset_value_x_add = rt.quat(0.0871557/2, 0, 0, 0.999048)
-            self.offset_value_x_sub = rt.quat(-0.0871557/2, 0, 0, 0.999048)
+            # value  = 0.05
+            self.offset_value_x_add = rt.Point3(0.1,0,0)
+            self.offset_value_x_sub = rt.Point3(-0.1,0,0)
 
-            self.offset_value_y_add = rt.quat(0, 0, 0.0871557/2, 0.999048)
-            self.offset_value_y_sub = rt.quat(0, 0, -0.0871557/2, 0.999048)
+            self.offset_value_y_add = rt.Point3(0,0.1,0)
+            self.offset_value_y_sub = rt.Point3(0,-0.1,0)
 
-            self.offset_value_z_add = rt.quat(0, 0.0871557/2, 0, 0.999048)
-            self.offset_value_z_sub = rt.quat(0, -0.0871557/2, 0, 0.999048)
+            self.offset_value_z_add = rt.Point3(0,0,0.1)
+            self.offset_value_z_sub = rt.Point3(0,0,-0.1)
 
 
         if(self.rad_ten.isChecked()):
+            # value  = 1
+            self.offset_value_x_add = rt.Point3(1,0,0)
+            self.offset_value_x_sub = rt.Point3(-1,0,0)
 
-            self.offset_value_x_add = rt.quat(0.0871557, 0, 0, 0.996195)
-            self.offset_value_x_sub = rt.quat(-0.0871557, 0, 0, 0.996195)
+            self.offset_value_y_add = rt.Point3(0,1,0)
+            self.offset_value_y_sub = rt.Point3(0,-1,0)
 
-            self.offset_value_y_add = rt.quat(0, 0, 0.0871557, 0.996195)
-            self.offset_value_y_sub = rt.quat(0, 0, -0.0871557, 0.996195)
-
-            self.offset_value_z_add = rt.quat(0, 0.0871557, 0, 0.996195)
-            self.offset_value_z_sub = rt.quat(0, -0.0871557, 0, 0.996195)
+            self.offset_value_z_add = rt.Point3(0,0,1)
+            self.offset_value_z_sub = rt.Point3(0,0,-1)
 
     def store_1(self):
-        self.bitArray_sel = self.normal.GetSelection()
+        self.bitArray_sel_1 = self.normal.GetSelection()  # 得到选择的法线数组
 
-    def  select_1(self):
+        # 数据类型转换
+        bitArray_sel_1 = self.normal.GetSelection()
+        rt.execute("fn b2a b = (return b as Array)")  # 强制使用maxscript  创建函数 bitarray to array
+        self.array_select_normal = rt.b2a(bitArray_sel_1)  # bitarray to array
+
+        # 迭代器
+        self.array_normal_dir = []
+        for x in self.array_select_normal:
+            self.normalTest = self.normal.GetNormal(x)  # 传入index，得到index法线对应的方向向量
+            self.array_normal_dir.append(self.normalTest)  #
+
+    def select_1(self):
 
         self.normal_selection_1 = self.normal.SetSelection(self.bitArray_sel)
+
+    def recover_1(self):
+        x = 0
+        for a in self.array_select_normal:
+            self.normal.SetNormal(a, self.array_normal_dir[x])
+            if (x <= len(self.array_select_normal)):
+                x = x + 1
+            rt.redrawViews()
 
     def store_2(self):
 
