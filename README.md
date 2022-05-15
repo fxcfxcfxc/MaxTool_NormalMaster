@@ -1,1 +1,1 @@
-# 3dmaxNormalTool
+# 法线工具
