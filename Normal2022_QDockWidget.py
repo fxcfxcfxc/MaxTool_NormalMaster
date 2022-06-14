@@ -2,7 +2,7 @@ import os
 from PySide2.QtWidgets import QVBoxLayout
 from PySide2.QtWidgets import QWidget
 from PySide2.QtWidgets import QDockWidget
-from PySide2.QtWidgets import QPushButton,QRadioButton,QSlider
+from PySide2.QtWidgets import QPushButton,QRadioButton,QSlider,QLabel
 from PySide2.QtCore import QFile
 from PySide2 import QtCore
 from PySide2.QtUiTools import QUiLoader
@@ -19,24 +19,42 @@ from pymxs import runtime as rt
 
 #继承Qdialog类，代表对话框类
 class TestDialog(QDockWidget):
-    #TestDialog类的构造函数，传入参数，参数为类类型
+    #TestDialog类的构造函数
     def __init__(self, parent=None):
         # 继承父类的构造方法
         # 经典类的写法： 父类名称.__init__(self, 参数1，参数2，...)
         # 新式类的写法：super(子类，self).__init__(参数1，参数2，....)
         # 当testDialog被实例化之后，调用顺序  自己的__init__ ——> 父类__init__
-        super(TestDialog, self).__init__(parent)#经典写法，继承父类的构造函数,也就是拥有父类的属性和方法
-        loader = QUiLoader()#QuiLoder类 主要负责加载UI外部文件
+        # 经典写法，继承父类的构造函数,也就是拥有父类的属性和方法
+        super(TestDialog, self).__init__(parent)
+
+
+        # QuiLoder类 主要负责加载UI外部文件
+        loader = QUiLoader()
+
+        #得到ui文件路径
         ui_file_path = os.path.join(  os.path.dirname(os.path.realpath(__file__)), 'ui/normal.ui')
+
+        #读取ui
         ui_file = QFile(ui_file_path)#打开文件
         ui_file.open(QFile.ReadOnly)#文件只读
-        self.ui = loader.load(ui_file, self)#导入ui内部的信息
+
+        # 导入ui内部的信息
+        self.ui = loader.load(ui_file, self)
         ui_file.close()
-        #-----
+
+
+        #设置窗口属性
         self.setWindowFlags(QtCore.Qt.Tool)#设置窗口属性，枚举
-        self.setWindowTitle("技术中心_法线工具v1.0")
+        self.setWindowTitle("技术中心_法线工具")
+
+        #创建组件
         self.creat_widget()
+
+        #链接方法
         self.creat_layout()
+
+
         self.resize(500, 550)
 
     def creat_widget(self):
@@ -67,6 +85,13 @@ class TestDialog(QDockWidget):
         self.but_normal_strore_3 = self.ui.findChild(QPushButton, 'but_normal_strore_3')
         self.but_normal_select_3 = self.ui.findChild(QPushButton, 'but_normal_select_3')
         self.btn_recover_normal3 = self.ui.findChild(QPushButton, 'btn_recover_normal3')
+
+        self.but_normal_pick = self.ui.findChild(QPushButton, 'pushButtonPick')
+        self.but_normal_stroe = self.ui.findChild(QPushButton, 'pushButtonStore')
+        self.but_TransformNorml = self.ui.findChild(QPushButton, 'TransformNorml')
+
+        self.but_label_5 = self.ui.findChild(QLabel, 'label_5')
+        self.but_label_6 = self.ui.findChild(QLabel, 'label_6')
 
         self.start_value()
 
@@ -99,7 +124,80 @@ class TestDialog(QDockWidget):
 
         self.horizontalSlider.valueChanged.connect(self.normal_length)
 
+
+
+        self.but_normal_pick.clicked.connect(self.getNormalTransformTarget)
+        self.but_normal_stroe.clicked.connect(self.getMyNormalObject)
+        self.but_TransformNorml.clicked.connect(self.setTransformNormal)
+
+        self.horizontalSlider.valueChanged.connect(self.normal_length)
+
+
         self.resize(500, 550)
+
+
+    def getNormalTransformTarget(self):
+
+        #获取a物体
+        self.a_target = rt.selection[0]
+
+        #获取a物体的顶点数量
+        self.a_Count = rt.getPolygonCount(self.a_target)[1]
+
+        #将a物体名称设置到label上
+        self.but_label_5.setText(self.a_target.name)
+
+        rt.setRefCoordSys(rt.Name('world'))
+
+
+    def getMyNormalObject(self):
+
+        #获取b物体
+        self.b_target = rt.selection[0]
+
+        # 获取b物体的顶点数量
+        self.b_Count = rt.getPolygonCount(self.b_target)[1]
+
+        # 将b物体名称设置到label上
+        self.but_label_6.setText(self.b_target.name)
+
+
+
+    def setTransformNormal(self):
+        #设置使用世界坐标
+        rt.setRefCoordSys(rt.Name('world'))
+
+        #得到a物体的第一个点位置
+        a_num1 = rt.getVert(self.a_target, 1)
+
+
+        a_index=1;
+
+        my_array = []
+        # 遍历b物体的每一个顶点·
+        for b_index in range(self.b_Count):
+                #得到b物体 当前点位置
+                b_pos = rt.getVert(self.b_target,b_index+1)
+                #算出当前点 到 a物体 序号为1的顶点 距离
+                min_distance = rt.distance(b_pos,a_num1);
+
+
+                finalindex=1;
+                #遍历a物体的每一个顶点，从第二个顶点开始,和B当前循环点算距离，和第一个顶点距离作比较，小于就更新最小值
+                for a_index in range(self.a_Count):
+                    a_pos = rt.getVert(self.a_target,a_index+1)
+                    comp_distance = rt.distance(b_pos,a_pos);
+                    if(comp_distance < min_distance):
+                        min_distance = comp_distance
+                        finalpos = a_pos
+                        finalindex = a_index+1
+                #my_array.append(finalindex)
+                normalDir =   rt.getNormal(self.a_target,finalindex)
+                rt.setNormal(self.b_target, b_index+1 ,normalDir)
+
+        rt.redrawViews()
+
+
 
     def start_value(self):
         #设置初始化偏移值，防止报错
