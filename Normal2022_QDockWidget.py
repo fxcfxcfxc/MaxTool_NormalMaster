@@ -135,33 +135,41 @@ class TestDialog(QDockWidget):
 
         self.resize(500, 550)
 
-
     def getNormalTransformTarget(self):
 
-        #获取a物体
-        self.a_target = rt.selection[0]
+        #判断是否只选择了一个物体
+        if(1 == len(rt.selection)):
+            # 获取a物体
+            self.a_target = rt.selection[0]
 
-        #获取a物体的顶点数量
-        self.a_Count = rt.getPolygonCount(self.a_target)[1]
+            #获取a物体的顶点数量
+            self.a_Count = rt.getPolygonCount(self.a_target)[1]
 
-        #将a物体名称设置到label上
-        self.but_label_5.setText(self.a_target.name)
+            #将a物体名称设置到label上
+            self.but_label_5.setText(self.a_target.name)
 
-        rt.setRefCoordSys(rt.Name('world'))
+            #转换为edit_mesh
+            rt.convertToMesh(self.a_target)
 
+        else:
+            #如果没有选择物体就窗口警告
+            rt.messageBox("没有选择物体或选择了个多个物体")
 
     def getMyNormalObject(self):
 
-        #获取b物体
-        self.b_target = rt.selection[0]
+        if (1 == len(rt.selection) ):
+            #获取b物体
+            self.b_target = rt.selection[0]
 
-        # 获取b物体的顶点数量
-        self.b_Count = rt.getPolygonCount(self.b_target)[1]
+            # 获取b物体的顶点数量
+            self.b_Count = rt.getPolygonCount(self.b_target)[1]
 
-        # 将b物体名称设置到label上
-        self.but_label_6.setText(self.b_target.name)
+            # 将b物体名称设置到label上
+            self.but_label_6.setText(self.b_target.name)
 
-
+            rt.convertToMesh(self.b_target)
+        else:
+            rt.messageBox("没有选择物体或选择了个多个物体")
 
     def setTransformNormal(self):
         #设置使用世界坐标
@@ -171,33 +179,35 @@ class TestDialog(QDockWidget):
         a_num1 = rt.getVert(self.a_target, 1)
 
 
-        a_index=1;
-
-        my_array = []
         # 遍历b物体的每一个顶点·
         for b_index in range(self.b_Count):
-                #得到b物体 当前点位置
+                #根据顶点序号得到b物体 当前点位置（顶点序号从1开始时）
                 b_pos = rt.getVert(self.b_target,b_index+1)
+
                 #算出当前点 到 a物体 序号为1的顶点 距离
-                min_distance = rt.distance(b_pos,a_num1);
+                min_distance = rt.distance(b_pos,a_num1)
 
-
+                #用来存储对应 最近的点 的序号
                 finalindex=1;
                 #遍历a物体的每一个顶点，从第二个顶点开始,和B当前循环点算距离，和第一个顶点距离作比较，小于就更新最小值
                 for a_index in range(self.a_Count):
-                    a_pos = rt.getVert(self.a_target,a_index+1)
-                    comp_distance = rt.distance(b_pos,a_pos);
-                    if(comp_distance < min_distance):
-                        min_distance = comp_distance
-                        finalpos = a_pos
-                        finalindex = a_index+1
-                #my_array.append(finalindex)
-                normalDir =   rt.getNormal(self.a_target,finalindex)
+                    if a_index+2 <= self.a_Count :
+                        a_pos = rt.getVert(self.a_target,a_index+2)
+                        comp_distance = rt.distance(b_pos,a_pos)
+                        if(comp_distance < min_distance):
+                            min_distance = comp_distance
+                            finalpos = a_pos
+                            finalindex = a_index+2
+
+                #从算出来的索引获取到  法线方向
+                normalDir = rt.getNormal(self.a_target,finalindex)
+
+                #将算出来的对应的 A物体的法线 传入    B物体
                 rt.setNormal(self.b_target, b_index+1 ,normalDir)
 
+
+        #更新视图
         rt.redrawViews()
-
-
 
     def start_value(self):
         #设置初始化偏移值，防止报错
@@ -368,7 +378,6 @@ class TestDialog(QDockWidget):
             if (x <= len(self.normal_array_3)):
                 x = x + 1
             rt.redrawViews()
-
 
 
 if __name__ == '__main__':
