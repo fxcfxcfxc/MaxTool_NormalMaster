@@ -12,20 +12,20 @@ from pymxs import runtime as rt
 3dmax2022  
 法线工具
 继承QDockWidget 版本，窗口属于3dmax工具面板
-
+python版本3.7
 
 '''
 
-
-#继承Qdialog类，代表对话框类
+#继承Qdialog类 这是一个窗口面板类型
 class TestDialog(QDockWidget):
-    #TestDialog类的构造函数
+    #构造函数，实例化时自动执行，用于初始化
     def __init__(self, parent=None):
         # 继承父类的构造方法
         # 经典类的写法： 父类名称.__init__(self, 参数1，参数2，...)
         # 新式类的写法：super(子类，self).__init__(参数1，参数2，....)
+
         # 当testDialog被实例化之后，调用顺序  自己的__init__ ——> 父类__init__
-        # 经典写法，继承父类的构造函数,也就是拥有父类的属性和方法
+        # 经典写法，继承父类的构造函数
         super(TestDialog, self).__init__(parent)
 
 
@@ -46,17 +46,21 @@ class TestDialog(QDockWidget):
 
         #设置窗口属性
         self.setWindowFlags(QtCore.Qt.Tool)#设置窗口属性，枚举
-        self.setWindowTitle("技术中心_法线工具")
+        self.setWindowTitle("技术中心_法线工具套件")
 
         #创建组件
         self.creat_widget()
 
+        #初始化UI组件值
+        self.start_value()
+
         #链接方法
         self.creat_layout()
 
-
+        #设置窗口大小
         self.resize(500, 550)
 
+    #创建ui组件
     def creat_widget(self):
 
         self.horizontalSlider = self.ui.findChild(QSlider, 'horizontalSlider')
@@ -93,8 +97,7 @@ class TestDialog(QDockWidget):
         self.but_label_5 = self.ui.findChild(QLabel, 'label_5')
         self.but_label_6 = self.ui.findChild(QLabel, 'label_6')
 
-        self.start_value()
-
+    #创建connect
     def creat_layout(self):
 
         self.but_display_normal.clicked.connect(self.add_normal)
@@ -135,6 +138,7 @@ class TestDialog(QDockWidget):
 
         self.resize(500, 550)
 
+    #-----------传递法线功能--------------
     def getNormalTransformTarget(self):
 
         #判断是否只选择了一个物体
@@ -146,7 +150,7 @@ class TestDialog(QDockWidget):
             self.a_Count = rt.getPolygonCount(self.a_target)[1]
 
             #将a物体名称设置到label上
-            self.but_label_5.setText(self.a_target.name)
+            self.but_label_5.setText("目标对象:"+self.a_target.name)
 
             #转换为edit_mesh
             rt.convertToMesh(self.a_target)
@@ -165,7 +169,7 @@ class TestDialog(QDockWidget):
             self.b_Count = rt.getPolygonCount(self.b_target)[1]
 
             # 将b物体名称设置到label上
-            self.but_label_6.setText(self.b_target.name)
+            self.but_label_6.setText("最终对象:"+self.b_target.name)
 
             rt.convertToMesh(self.b_target)
         else:
@@ -178,8 +182,7 @@ class TestDialog(QDockWidget):
         #得到a物体的第一个点位置
         a_num1 = rt.getVert(self.a_target, 1)
 
-
-        # 遍历b物体的每一个顶点·
+        # 遍历b物体的每一个顶点
         for b_index in range(self.b_Count):
                 #根据顶点序号得到b物体 当前点位置（顶点序号从1开始时）
                 b_pos = rt.getVert(self.b_target,b_index+1)
@@ -199,16 +202,18 @@ class TestDialog(QDockWidget):
                             finalpos = a_pos
                             finalindex = a_index+2
 
-                #从算出来的索引获取到  法线方向
+                #从算出来的顶点索引获取到 对应点的法线方向
                 normalDir = rt.getNormal(self.a_target,finalindex)
 
-                #将算出来的对应的 A物体的法线 传入    B物体
+                #将算出来的对应的 A物体的顶点的法线 传入B物体的顶点法线
                 rt.setNormal(self.b_target, b_index+1 ,normalDir)
 
-
+        rt.messageBox("传递结束")
         #更新视图
-        rt.redrawViews()
+        #rt.redrawViews()
 
+
+    #-----------偏移功能-----------------
     def start_value(self):
         #设置初始化偏移值，防止报错
         if (self.rad_one.isChecked()):
@@ -223,21 +228,30 @@ class TestDialog(QDockWidget):
             self.offset_value_z_sub = rt.Point3(0, 0, -0.05)
 
     def normal_length(self):
-        #设置修改器法线长度值等于滑块值
+        #将滑块UI值 传入法线修改器值
         self.normal.displayLength = self.horizontalSlider.value()
 
     def add_normal(self):
+        #生成一个法线修改器对象
         self.normal = rt.Edit_Normals()
+
+        #获取当前选择的物体 返回数组
         a = rt.selection
 
+        #将物体a加上之前的修改器
         for x in a :
             rt.addModifier(x,self.normal)
 
-        #将滑块ui的值设置成法线修改器的默认值
+
+        #更新UI组件的显示值为修改器默认值
         self.horizontalSlider.setValue(self.normal.displayLength)
+
+
         rt.redrawViews()
 
     def close_normal(self):
+
+        #转化为convertTopoly
         rt.convertToPoly(rt.selection)
         return
         rt.redrawViews()
@@ -295,25 +309,31 @@ class TestDialog(QDockWidget):
             self.offset_value_z_add = rt.Point3(0,0,1)
             self.offset_value_z_sub = rt.Point3(0,0,-1)
 
-    def get_normal_array(self,bitArray):
 
-        # 暴露函数 bitarray to array
+    # 自定义函数 b2a ，将bitarray类型 转换为 python array类型
+    def get_normal_array(self,bitArray):
         rt.execute("fn b2a b = (return b as Array)")
+
         # 类型转换bitarray -》 array
         array_select_normal = rt.b2a(bitArray)
-        return array_select_normal;
+        return array_select_normal
 
+    #自定义函数
     def store_normal(self,array):
-        # 法线向量数组存储
-        array_normal_dir = [];
+        # 存储法 线方向
+        array_normal_dir = []
         for x in array:
             normalTest = self.normal.GetNormal(x)  # 传入index，得到index法线对应的方向向量
             array_normal_dir.append(normalTest)  #
 
-        return array_normal_dir;
+        return array_normal_dir
 
+
+
+    #-----------------暂存法线功能---------------------
     def store_1(self):
-        self.bitArray_sel_1 = self.normal.GetSelection()#当前选择的法线索引存入 bitarray
+        #获取当前选择的法线索引
+        self.bitArray_sel_1 = self.normal.GetSelection()
         self.normal_array_1 = self.get_normal_array(self.bitArray_sel_1)
         self.normal_dir_1 = self.store_normal(self.normal_array_1)
 
@@ -380,16 +400,25 @@ class TestDialog(QDockWidget):
             rt.redrawViews()
 
 
+
+
 if __name__ == '__main__':
 
+    #异常处理，防止实例化多个窗口
     try:
         tool_window.close()
         tool_window.deleteLater()
 
     except:
         pass
+
+    #获取maxmainwindow 类型
     main_window2 = qtmax.GetQMaxMainWindow()
+
+    #实例化窗口，传入类型
     tool_window = TestDialog(parent=main_window2)
+
+    #设置窗口浮动
     tool_window.setFloating(True)
     tool_window.show()
 

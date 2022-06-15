@@ -77,7 +77,7 @@
          <string>1</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -311,7 +311,7 @@
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>objectA</string>
+           <string>目标对象</string>
           </property>
          </widget>
         </item>
@@ -329,7 +329,7 @@
         <item>
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>objectB</string>
+           <string>最终对象</string>
           </property>
          </widget>
         </item>
@@ -338,7 +338,7 @@
       <item>
        <widget class="QPushButton" name="TransformNorml">
         <property name="text">
-         <string>传递</string>
+         <string>传递(点击后稍等一会儿)</string>
         </property>
        </widget>
       </item>
