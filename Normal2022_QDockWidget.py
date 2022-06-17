@@ -39,6 +39,7 @@ class TestDialog(QDockWidget):
         ui_file = QFile(ui_file_path)#打开文件
         ui_file.open(QFile.ReadOnly)#文件只读
 
+
         # 导入ui内部的信息
         self.ui = loader.load(ui_file, self)
         ui_file.close()
@@ -208,14 +209,17 @@ class TestDialog(QDockWidget):
                 #将算出来的对应的 A物体的顶点的法线 传入B物体的顶点法线
                 rt.setNormal(self.b_target, b_index+1 ,normalDir)
 
+        rt.convertToPoly(self.a_target)
+        rt.convertToPoly(self.b_target)
         rt.messageBox("传递结束")
+
         #更新视图
         #rt.redrawViews()
 
 
     #-----------偏移功能-----------------
+    #设置初始化偏移值，防止报错
     def start_value(self):
-        #设置初始化偏移值，防止报错
         if (self.rad_one.isChecked()):
             # value  = 0.1
             self.offset_value_x_add = rt.Point3(0.05, 0, 0)
@@ -266,7 +270,7 @@ class TestDialog(QDockWidget):
         self.normal.Move(self.offset_value_y_add)
 
     def offert_y_sub(self):
-        self.normal.Move(self.offset_value_z_sub)
+        self.normal.Move(self.offset_value_y_sub)
 
     def offert_z_add(self):
         self.normal.Move(self.offset_value_z_add)
@@ -311,7 +315,7 @@ class TestDialog(QDockWidget):
 
 
     # 自定义函数 b2a ，将bitarray类型 转换为 python array类型
-    def get_normal_array(self,bitArray):
+    def bitArray_To_Array(self, bitArray):
         rt.execute("fn b2a b = (return b as Array)")
 
         # 类型转换bitarray -》 array
@@ -331,10 +335,15 @@ class TestDialog(QDockWidget):
 
 
     #-----------------暂存法线功能---------------------
+    #法线数据暂存
     def store_1(self):
         #获取当前选择的法线索引
         self.bitArray_sel_1 = self.normal.GetSelection()
-        self.normal_array_1 = self.get_normal_array(self.bitArray_sel_1)
+
+        #数据类型转换 bitarray -》array
+        self.normal_array_1 = self.bitArray_To_Array(self.bitArray_sel_1)
+
+        #根据索引得到方向值，存入数组，从0开始
         self.normal_dir_1 = self.store_normal(self.normal_array_1)
 
         '''
@@ -352,22 +361,31 @@ class TestDialog(QDockWidget):
             self.array_normal_dir.append(self.normalTest) #
         '''
 
+    #选择法线
     def select_1(self):
 
+        #选择之前存入的法线
         self.normal_selection_1 = self.normal.SetSelection(self.bitArray_sel_1)
 
+    #法线数据回到初始
     def recover_1(self):
+
+
         x = 0
+        #遍历之前的索引数组
         for a in self.normal_array_1:
+
+            #a是从1 开始，x是从0开始 ，代表方向值的索引
+            #索引a的法线 对应的向量值 a+1 的索引
             self.normal.SetNormal(a, self.normal_dir_1[x])
             if (x <= len(self.normal_array_1)):
-                x = x + 1
+                x += 1
             rt.redrawViews()
 
     def store_2(self):
 
         self.bitArray_sel_2 = self.normal.GetSelection()  # 当前选择的法线索引存入 bitarray
-        self.normal_array_2 = self.get_normal_array(self.bitArray_sel_2)
+        self.normal_array_2 = self.bitArray_To_Array(self.bitArray_sel_2)
         self.normal_dir_2 = self.store_normal(self.normal_array_2)
 
     def select_2(self):
@@ -383,8 +401,8 @@ class TestDialog(QDockWidget):
             rt.redrawViews()
 
     def store_3(self):
-        self.bitArray_sel_3 = self.normal.GetSelection()  # 当前选择的法线索引存入 bitarray
-        self.normal_array_3 = self.get_normal_array(self.bitArray_sel_3)
+        self.bitArray_sel_3 = self.normal.GetSelection()
+        self.normal_array_3 = self.bitArray_To_Array(self.bitArray_sel_3)
         self.normal_dir_3 = self.store_normal(self.normal_array_3)
 
     def select_3(self):
