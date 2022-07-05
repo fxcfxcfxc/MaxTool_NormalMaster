@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>242</width>
-    <height>391</height>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -341,7 +341,7 @@
       <item>
        <widget class="QPushButton" name="TransformNorml">
         <property name="text">
-         <string>传递(点击后稍等一会儿)</string>
+         <string>传递(速度待优化)</string>
         </property>
        </widget>
       </item>

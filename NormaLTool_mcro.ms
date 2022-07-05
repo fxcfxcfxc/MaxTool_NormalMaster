@@ -5,5 +5,5 @@ buttontext: "NormalTool"
 icon: #("AutoGrid",1)
 
 (
-	python.ExecuteFile @"C:\DamMaxTools\NormalTools\Normal2022_QDockWidget.py"
+	python.ExecuteFile @"C:\DamMaxTools\MaxTool_NormalMaster\Normal2022_QDockWidget.py"
 )

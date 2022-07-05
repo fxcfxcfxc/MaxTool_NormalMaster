@@ -1,20 +1,130 @@
 import os
-from PySide2.QtWidgets import QVBoxLayout
+import sys
+sys.path.append(r'E:\CodeProject\MaxTool_NormalMaster')
+sys.path.append(r'C:\DamMaxTools')
+from PySide2.QtWidgets import QVBoxLayout,QDialog
 from PySide2.QtWidgets import QWidget
-from PySide2.QtWidgets import QDockWidget
-from PySide2.QtWidgets import QPushButton,QRadioButton,QSlider,QLabel
-from PySide2.QtCore import QFile
+from PySide2.QtWidgets import QDockWidget,QProgressDialog
+from PySide2.QtWidgets import QPushButton,QRadioButton,QSlider,QLabel, QProgressBar, QVBoxLayout
+from PySide2.QtCore import QFile,QThread, Signal
 from PySide2 import QtCore
 from PySide2.QtUiTools import QUiLoader
 import qtmax
 from pymxs import runtime as rt
+import time
+
+
+
+
 '''
 3dmax2022  
-法线工具
 继承QDockWidget 版本，窗口属于3dmax工具面板
 python版本3.7
 
 '''
+
+class Worker(QThread):
+    """
+    Worker thread
+    """
+    progress = Signal()
+    aborted = False
+    def __init__(self,normal_array_1, normalmodif, normal_dir_1):
+        """
+        Construct the worker
+        """
+        QThread.__init__(self)
+
+        self.normal_array_1 = normal_array_1
+        self.normal = normalmodif
+        self.normal_dir_1 = normal_dir_1
+
+        self.progress.emit()
+
+        x = 0
+        # 遍历之前的索引数组
+        for a in self.normal_array_1:
+
+            # a是从1 开始，x是从0开始 ，代表方向值的索引
+            # 索引a的法线 对应的向量值 a+1 的索引
+            self.normal.SetNormal(a, self.normal_dir_1[x])
+            if (x <= len(self.normal_array_1)):
+                x += 1
+            rt.redrawViews()
+            time.sleep(0.1)
+        rt.redrawViews()
+
+
+    def run(self):
+        print("ss")
+        # self.progress.emit()
+        # print("aaaaaa")
+        # x = 0
+        # # 遍历之前的索引数组
+        # for a in self.normal_array_1:
+        #
+        #     # a是从1 开始，x是从0开始 ，代表方向值的索引
+        #     # 索引a的法线 对应的向量值 a+1 的索引
+        #     self.normal.SetNormal(a, self.normal_dir_1[x])
+        #     if (x <= len(self.normal_array_1)):
+        #         x += 1
+        #     rt.redrawViews()
+        #     time.sleep(0.1)
+        # rt.redrawViews()
+
+
+        # """
+        # Increment a counter an notify progress.
+        # Abort if aborted is True
+        # # """
+        # for i in range(0, 100):
+        #     self.progress.emit(i)
+        #
+        #     #延迟0.5秒执行
+        #     time.sleep(0.5)
+        #     if self.aborted:
+        #         return
+        #
+        # self.progress.emit(100)
+
+    def abort(self):
+        """
+        Make the worker terminate before it's done.
+        """
+        self.aborted = True
+
+class PyMaxDialog(QDialog):
+    """
+    Custom dialog attached to the 3ds Max main window
+    """
+    def __init__(self, parent=QWidget.find(rt.windows.getMAXHWND())):
+        super(PyMaxDialog, self).__init__(parent)
+        self.setWindowTitle('Progress')
+
+        main_layout = QVBoxLayout()
+        label = QLabel("Progress so far")
+        main_layout.addWidget(label)
+
+        # progress bar
+        self.progb = QProgressBar()
+        self.progb.minimum = 0
+        self.progb.maximum = 0
+        main_layout.addWidget(self.progb)
+
+        # abort button
+        btn = QPushButton("abort")
+        main_layout.addWidget(btn)
+
+        self.setLayout(main_layout)
+        self.resize(350, 100)
+
+        # # # start the worker
+        # self.worker = Worker()
+        # self.worker.progress.connect(progb.setValue)
+        # self.worker.start()
+        #
+        # # connect abort button
+        # btn.clicked.connect(self.worker.abort)
 
 #继承Qdialog类 这是一个窗口面板类型
 class TestDialog(QDockWidget):
@@ -56,7 +166,7 @@ class TestDialog(QDockWidget):
         self.start_value()
 
         #链接方法
-        self.creat_layout()
+        self.creat_connections()
 
         #设置窗口大小
         self.resize(500, 550)
@@ -98,8 +208,11 @@ class TestDialog(QDockWidget):
         self.but_label_5 = self.ui.findChild(QLabel, 'label_5')
         self.but_label_6 = self.ui.findChild(QLabel, 'label_6')
 
+
+
     #创建connect
-    def creat_layout(self):
+    def creat_connections(self):
+
 
         self.but_display_normal.clicked.connect(self.add_normal)
         self.rad_one.toggled.connect(self.offset_value_rad)
@@ -136,11 +249,14 @@ class TestDialog(QDockWidget):
 
         self.horizontalSlider.valueChanged.connect(self.normal_length)
 
-
         self.resize(500, 550)
 
     #-----------传递法线功能--------------
     def getNormalTransformTarget(self):
+
+
+
+
 
         #判断是否只选择了一个物体
         if(1 == len(rt.selection)):
@@ -177,9 +293,10 @@ class TestDialog(QDockWidget):
             rt.messageBox("没有选择物体或选择了个多个物体")
 
     def setTransformNormal(self):
+
         #设置使用世界坐标
         rt.setRefCoordSys(rt.Name('world'))
-
+        por = self.setPrograss()
         #得到a物体的第一个点位置
         a_num1 = rt.getVert(self.a_target, 1)
 
@@ -195,6 +312,7 @@ class TestDialog(QDockWidget):
                 finalindex=1;
                 #遍历a物体的每一个顶点，从第二个顶点开始,和B当前循环点算距离，和第一个顶点距离作比较，小于就更新最小值
                 for a_index in range(self.a_Count):
+                    QtCore.QCoreApplication.processEvents()
                     if a_index+2 <= self.a_Count :
                         a_pos = rt.getVert(self.a_target,a_index+2)
                         comp_distance = rt.distance(b_pos,a_pos)
@@ -211,8 +329,9 @@ class TestDialog(QDockWidget):
 
         rt.convertToPoly(self.a_target)
         rt.convertToPoly(self.b_target)
-        rt.messageBox("传递结束")
+        # rt.messageBox("传递结束")
 
+        por.close()
         #更新视图
         #rt.redrawViews()
 
@@ -337,6 +456,7 @@ class TestDialog(QDockWidget):
     #-----------------暂存法线功能---------------------
     #法线数据暂存
     def store_1(self):
+
         #获取当前选择的法线索引
         self.bitArray_sel_1 = self.normal.GetSelection()
 
@@ -367,20 +487,46 @@ class TestDialog(QDockWidget):
         #选择之前存入的法线
         self.normal_selection_1 = self.normal.SetSelection(self.bitArray_sel_1)
 
+
+    def runtest(self):
+        dialog = PyMaxDialog()
+        dialog.show()
+
+        self.worker = Worker( self.normal_array_1, self.normal , self.normal_dir_1)
+        # self.worker.progress.connect(dialog.progb.setValue)
+        self.worker.start()
+
+    #创建一个进度条
+    def setPrograss(self):
+        num =5
+        pro = QProgressDialog("waiting to proces", "Cancel", 0, num, self)
+        pro.setWindowTitle("ProGress")
+        pro.setRange(0, 0)
+        pro.setWindowModality(QtCore.Qt.WindowModal)
+        pro.resize(650, 220)
+        pro.show()
+
+        return pro
+
     #法线数据回到初始
     def recover_1(self):
-
-
+        pro = self.setPrograss()
         x = 0
         #遍历之前的索引数组
         for a in self.normal_array_1:
-
             #a是从1 开始，x是从0开始 ，代表方向值的索引
             #索引a的法线 对应的向量值 a+1 的索引
             self.normal.SetNormal(a, self.normal_dir_1[x])
             if (x <= len(self.normal_array_1)):
                 x += 1
             rt.redrawViews()
+            pro.setRange(0, 0)
+            #刷新ui
+            QtCore.QCoreApplication.processEvents()
+
+        rt.redrawViews()
+        pro.close()
+
 
     def store_2(self):
 
@@ -419,8 +565,9 @@ class TestDialog(QDockWidget):
 
 
 
-
 if __name__ == '__main__':
+
+
 
     #异常处理，防止实例化多个窗口
     try:
