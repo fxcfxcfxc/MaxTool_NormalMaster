@@ -14,14 +14,13 @@ from pymxs import runtime as rt
 import time
 
 
-
-
 '''
 3dmax2022  
 继承QDockWidget 版本，窗口属于3dmax工具面板
 python版本3.7
 
 '''
+
 
 class Worker(QThread):
     """
@@ -162,14 +161,13 @@ class TestDialog(QDockWidget):
         #创建组件
         self.creat_widget()
 
-        #初始化UI组件值
-        self.start_value()
 
         #链接方法
         self.creat_connections()
 
         #设置窗口大小
         self.resize(500, 550)
+        self.setValue()
 
     #创建ui组件
     def creat_widget(self):
@@ -207,8 +205,6 @@ class TestDialog(QDockWidget):
 
         self.but_label_5 = self.ui.findChild(QLabel, 'label_5')
         self.but_label_6 = self.ui.findChild(QLabel, 'label_6')
-
-
 
     #创建connect
     def creat_connections(self):
@@ -251,12 +247,21 @@ class TestDialog(QDockWidget):
 
         self.resize(500, 550)
 
-    #-----------传递法线功能--------------
+    def setValue(self):
+        self.offsetvalue = 0.1
+        if (self.rad_five.isChecked()):
+            # value  = 0.05
+            self.offset_value_x_add = rt.Point3(self.offsetvalue, 0, 0)
+            self.offset_value_x_sub = rt.Point3(-self.offsetvalue, 0, 0)
+
+            self.offset_value_y_add = rt.Point3(0, self.offsetvalue, 0)
+            self.offset_value_y_sub = rt.Point3(0, -self.offsetvalue, 0)
+
+            self.offset_value_z_add = rt.Point3(0, 0, self.offsetvalue)
+            self.offset_value_z_sub = rt.Point3(0, 0, -self.offsetvalue)
+
+    #-----------------------------------传递法线功能
     def getNormalTransformTarget(self):
-
-
-
-
 
         #判断是否只选择了一个物体
         if(1 == len(rt.selection)):
@@ -335,20 +340,7 @@ class TestDialog(QDockWidget):
         #更新视图
         #rt.redrawViews()
 
-
-    #-----------偏移功能-----------------
-    #设置初始化偏移值，防止报错
-    def start_value(self):
-        if (self.rad_one.isChecked()):
-            # value  = 0.1
-            self.offset_value_x_add = rt.Point3(0.05, 0, 0)
-            self.offset_value_x_sub = rt.Point3(-0.05, 0, 0)
-
-            self.offset_value_y_add = rt.Point3(0, 0.05, 0)
-            self.offset_value_y_sub = rt.Point3(0, -0.05, 0)
-
-            self.offset_value_z_add = rt.Point3(0, 0, 0.05)
-            self.offset_value_z_sub = rt.Point3(0, 0, -0.05)
+    #----------------------------固定值偏移
 
     def normal_length(self):
         #将滑块UI值 传入法线修改器值
@@ -399,38 +391,41 @@ class TestDialog(QDockWidget):
 
     def offset_value_rad(self):
         if(self.rad_one.isChecked()):
-            # value  = 0.1
-            self.offset_value_x_add = rt.Point3(0.05,0,0)
-            self.offset_value_x_sub = rt.Point3(-0.05,0,0)
+            # value  = 0.05
+            self.offsetvalue = 0.05
+            self.offset_value_x_add = rt.Point3(self.offsetvalue,0,0)
+            self.offset_value_x_sub = rt.Point3(-self.offsetvalue,0,0)
 
-            self.offset_value_y_add = rt.Point3(0,0.05,0)
-            self.offset_value_y_sub = rt.Point3(0,-0.05,0)
+            self.offset_value_y_add = rt.Point3(0,self.offsetvalue,0)
+            self.offset_value_y_sub = rt.Point3(0,-self.offsetvalue,0)
 
-            self.offset_value_z_add = rt.Point3(0,0,0.05)
-            self.offset_value_z_sub = rt.Point3(0,0,-0.05)
+            self.offset_value_z_add = rt.Point3(0,0,self.offsetvalue)
+            self.offset_value_z_sub = rt.Point3(0,0,-self.offsetvalue)
 
         if(self.rad_five.isChecked()):
-            # value  = 0.05
-            self.offset_value_x_add = rt.Point3(0.1,0,0)
-            self.offset_value_x_sub = rt.Point3(-0.1,0,0)
+            # value  = 0.1
+            self.offsetvalue = 0.1
+            self.offset_value_x_add = rt.Point3(self.offsetvalue,0,0)
+            self.offset_value_x_sub = rt.Point3(-self.offsetvalue,0,0)
 
-            self.offset_value_y_add = rt.Point3(0,0.1,0)
-            self.offset_value_y_sub = rt.Point3(0,-0.1,0)
+            self.offset_value_y_add = rt.Point3(0,self.offsetvalue,0)
+            self.offset_value_y_sub = rt.Point3(0,-self.offsetvalue,0)
 
-            self.offset_value_z_add = rt.Point3(0,0,0.1)
-            self.offset_value_z_sub = rt.Point3(0,0,-0.1)
+            self.offset_value_z_add = rt.Point3(0,0,self.offsetvalue)
+            self.offset_value_z_sub = rt.Point3(0,0,-self.offsetvalue)
 
 
         if(self.rad_ten.isChecked()):
             # value  = 1
-            self.offset_value_x_add = rt.Point3(1,0,0)
-            self.offset_value_x_sub = rt.Point3(-1,0,0)
+            self.offsetvalue = 1
+            self.offset_value_x_add = rt.Point3(self.offsetvalue,0,0)
+            self.offset_value_x_sub = rt.Point3(-self.offsetvalue,0,0)
 
-            self.offset_value_y_add = rt.Point3(0,1,0)
-            self.offset_value_y_sub = rt.Point3(0,-1,0)
+            self.offset_value_y_add = rt.Point3(0,self.offsetvalue,0)
+            self.offset_value_y_sub = rt.Point3(0,-self.offsetvalue,0)
 
-            self.offset_value_z_add = rt.Point3(0,0,1)
-            self.offset_value_z_sub = rt.Point3(0,0,-1)
+            self.offset_value_z_add = rt.Point3(0,0,self.offsetvalue)
+            self.offset_value_z_sub = rt.Point3(0,0,-self.offsetvalue)
 
 
     # 自定义函数 b2a ，将bitarray类型 转换为 python array类型
@@ -441,7 +436,7 @@ class TestDialog(QDockWidget):
         array_select_normal = rt.b2a(bitArray)
         return array_select_normal
 
-    #自定义函数
+
     def store_normal(self,array):
         # 存储法 线方向
         array_normal_dir = []
@@ -453,7 +448,7 @@ class TestDialog(QDockWidget):
 
 
 
-    #-----------------暂存法线功能---------------------
+    #---------------------暂存法线功能
     #法线数据暂存
     def store_1(self):
 
@@ -487,7 +482,7 @@ class TestDialog(QDockWidget):
         #选择之前存入的法线
         self.normal_selection_1 = self.normal.SetSelection(self.bitArray_sel_1)
 
-
+    '''
     def runtest(self):
         dialog = PyMaxDialog()
         dialog.show()
@@ -495,6 +490,8 @@ class TestDialog(QDockWidget):
         self.worker = Worker( self.normal_array_1, self.normal , self.normal_dir_1)
         # self.worker.progress.connect(dialog.progb.setValue)
         self.worker.start()
+        
+    '''
 
     #创建一个进度条
     def setPrograss(self):
@@ -527,16 +524,17 @@ class TestDialog(QDockWidget):
         rt.redrawViews()
         pro.close()
 
-
     def store_2(self):
 
         self.bitArray_sel_2 = self.normal.GetSelection()  # 当前选择的法线索引存入 bitarray
         self.normal_array_2 = self.bitArray_To_Array(self.bitArray_sel_2)
         self.normal_dir_2 = self.store_normal(self.normal_array_2)
 
+
     def select_2(self):
 
         self.normal_selection_2 = self.normal.SetSelection(self.bitArray_sel_2)
+
 
     def recover_2(self):
         x = 0
@@ -546,14 +544,17 @@ class TestDialog(QDockWidget):
                 x = x + 1
             rt.redrawViews()
 
+
     def store_3(self):
         self.bitArray_sel_3 = self.normal.GetSelection()
         self.normal_array_3 = self.bitArray_To_Array(self.bitArray_sel_3)
         self.normal_dir_3 = self.store_normal(self.normal_array_3)
 
+
     def select_3(self):
 
         self.normal_selection_3 = self.normal.SetSelection(self.bitArray_sel_3)
+
 
     def recover_3(self):
         x = 0
@@ -562,6 +563,8 @@ class TestDialog(QDockWidget):
             if (x <= len(self.normal_array_3)):
                 x = x + 1
             rt.redrawViews()
+
+
 
 
 
